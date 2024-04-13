@@ -38,6 +38,6 @@ jobs:
 
           - name: SSH into Server and Deploy
             run: |
-              ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && docker-compose pull && docker-compose up --build -d && exit"
+              ssh -v ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && docker-compose pull && docker-compose up --build -d && exit"
           - name: cleanup
             run: rm -rf ~/.ssh
