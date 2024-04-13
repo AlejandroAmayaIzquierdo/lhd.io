@@ -1,6 +1,6 @@
-CREATE DATABASE IF NOT EXISTS who_wrote_that;
+CREATE DATABASE IF NOT EXISTS lhdd;
 
-USE who_wrote_that;
+USE lhdd;
 
 CREATE TABLE `users` (
 	`id` VARCHAR(60) NOT NULL COLLATE 'latin1_swedish_ci',
@@ -56,14 +56,15 @@ COLLATE='latin1_swedish_ci';
 
 
 CREATE TABLE `cron_tasks` (
-    `id` INT(11) NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(50) NOT NULL DEFAULT '' COLLATE 'latin1_swedish_ci',
-    `schedule` VARCHAR(50) NOT NULL DEFAULT '' COLLATE 'latin1_swedish_ci',
-    `is_active` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-    `lastEnd` VARCHAR(50) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
-    PRIMARY KEY (`id`) USING BTREE
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`name` VARCHAR(50) NOT NULL DEFAULT '' COLLATE 'latin1_swedish_ci',
+	`schedule` VARCHAR(50) NOT NULL DEFAULT '' COLLATE 'latin1_swedish_ci',
+	`is_active` INT(1) UNSIGNED NOT NULL DEFAULT '0',
+	`lastEnd` VARCHAR(50) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
+	PRIMARY KEY (`id`) USING BTREE
 )
 COLLATE='latin1_swedish_ci';
+
 
 CREATE TABLE `chats` (
     `id` INT(11) NOT NULL AUTO_INCREMENT,
