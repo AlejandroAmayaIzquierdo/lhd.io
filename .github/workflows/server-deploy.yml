@@ -37,7 +37,7 @@ jobs:
               host: ${{ secrets.SSH_HOST }}
               username: ${{ secrets.SSH_USER }}
               password: ${{ secrets.SSH_PASSWORD }}
-              script: cd ${{ secrets.WORK_DIR }} && docker-compose pull && docker-compose up --build -d && exit
+              script: cd ${{ secrets.SERVER_WORK_DIR }} && docker-compose pull && docker-compose up --build -d && exit
 
           - name: cleanup
             run: rm -rf ~/.ssh
