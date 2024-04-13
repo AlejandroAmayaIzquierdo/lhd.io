@@ -2,7 +2,7 @@ name: Client Deployment
 
 on:
   push:
-    branches: [ "deploy" ]
+    branches: [ "main" ]
     paths:
       - 'Client/**'
 

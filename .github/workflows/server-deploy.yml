@@ -2,7 +2,7 @@ name: Server Deployment
 
 on:
   push:
-    branches: [ "deploy" ]
+    branches: [ "main" ]
     paths:
       - 'Server/**'
 
