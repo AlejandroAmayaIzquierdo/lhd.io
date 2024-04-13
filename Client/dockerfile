@@ -10,6 +10,8 @@ COPY . .
 
 RUN npm run build
 
+EXPOSE 5173
+
 RUN npm install -g serve
 
 CMD ["serve", "-s", "-n", "-l", "5173", "public"]
