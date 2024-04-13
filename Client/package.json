@@ -1,0 +1,19 @@
+{
+    "name": "kaboom-ts",
+    "version": "1.0.0",
+    "description": "A starter template for making Kaboom games in TypeScript",
+    "main": "main.js",
+    "scripts": {
+        "dev": "esbuild src/main.ts --serve=5173 --servedir=public --bundle --sourcemap --target=es6 --define:__DEV__=true --outfile=public/bundle.js",
+        "prod": "esbuild src/main.ts --serve=5173 --servedir=public --bundle --minify --target=es6 --define:__DEV__=false --outfile=public/bundle.js",
+        "build": "esbuild src/main.ts --bundle --minify --target=es6 --define:__DEV__=false --outfile=public/bundle.js"
+    },
+    "dependencies": {
+        "esbuild": "^0.14.39",
+        "kaboom": "^2000.2.9",
+        "socket.io-client": "^4.7.5"
+    },
+    "devDependencies": {
+        "typescript": "^5.4.4"
+    }
+}
