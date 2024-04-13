@@ -25,72 +25,122 @@ const joinRoomData = {
   private: false,
 };
 
-console.log(joinRoomData);
-socket.emit("joinRoom", joinRoomData);
-
 k.loadSprite("bean", "bean.png");
-const SPEED: number = 350;
 
-// Add player game object
-const player = add([sprite("bean"), pos(0, 0)]) as any;
+k.scene("main", () => {
+  const SPEED: number = 480;
+  const MAP_WIDTH = 20;
+  const MAP_HEIGHT = 10;
+  const BORDER_WIDTH = 64;
 
-socket.on("updateRoom", (data: { players: PlayerData[] }) => {
-  const playersData: PlayerData[] = data.players;
+  const player = k.add([k.sprite("bean"), k.pos(0, 0)]);
 
-  // Iterate through each player in the room
-  for (const playerData of playersData) {
-    const existingPlayer = users.find(
-      (user) => user.userID === playerData.userID
-    );
+  k.setBackground(141, 183, 255);
 
-    // If player is not already mounted, add them to the game
-    if (!existingPlayer) {
-      const newPlayer = add([
-        sprite("bean"),
-        pos(playerData.x, playerData.y), // Set initial position from server data
-      ]) as any;
-      newPlayer.userID = playerData.userID;
-      users.push(newPlayer);
-    } else {
-      // Update position of existing player
-      existingPlayer.pos.x = playerData.x;
-      existingPlayer.pos.y = playerData.y;
-    }
+  const topBorder = "=".repeat(MAP_WIDTH + 2);
+  const middleSpace = `=${" ".repeat(MAP_WIDTH)}=`;
+  const bottomBorder = "=".repeat(MAP_WIDTH + 2);
+
+  const mapDefinition = [topBorder];
+
+  for (let i = 0; i < MAP_HEIGHT; i++) {
+    mapDefinition.push(middleSpace);
   }
 
-  // Check for players that have left the room
-  users.forEach((existingPlayer) => {
-    const playerStillInRoom = playersData.find(
-      (playerData) => playerData.userID === existingPlayer.userID
-    );
-    if (!playerStillInRoom) {
-      destroy(existingPlayer); // Remove player from game
-      users.splice(users.indexOf(existingPlayer), 1); // Remove player from array
+  mapDefinition.push(bottomBorder);
+
+  k.addLevel(mapDefinition, {
+    tileHeight: BORDER_WIDTH,
+    tileWidth: BORDER_WIDTH,
+    pos: k.vec2(-BORDER_WIDTH / 2, -BORDER_WIDTH / 2),
+    tiles: {
+      "": () => [],
+      "=": () => [k.rect(BORDER_WIDTH, BORDER_WIDTH), k.color(0, 0, 0)],
+    },
+  });
+
+  socket.emit("joinRoom", joinRoomData);
+
+  socket.on("updateRoom", (data: { players: PlayerData[] }) => {
+    const playersData: PlayerData[] = data.players;
+
+    // Iterate through each player in the room
+    for (const playerData of playersData) {
+      const existingPlayer = users.find(
+        (user) => user.userID === playerData.userID
+      );
+
+      // If player is not already mounted, add them to the game
+      if (!existingPlayer) {
+        const newPlayer = k.add([
+          k.sprite("bean"),
+          k.pos(playerData.x, playerData.y), // Set initial position from server data
+        ]) as any;
+        newPlayer.userID = playerData.userID;
+        users.push(newPlayer);
+      } else {
+        // Update position of existing player
+        existingPlayer.pos.x = playerData.x;
+        existingPlayer.pos.y = playerData.y;
+      }
     }
+
+    // Check for players that have left the room
+    users.forEach((existingPlayer) => {
+      const playerStillInRoom = playersData.find(
+        (playerData) => playerData.userID === existingPlayer.userID
+      );
+      if (!playerStillInRoom) {
+        k.destroy(existingPlayer); // Remove player from game
+        users.splice(users.indexOf(existingPlayer), 1); // Remove player from array
+      }
+    });
+  });
+
+  player.onUpdate(() => {
+    socket.emit("updatePosition", {
+      roomID: "main",
+      userID: user,
+      x: player.pos.x,
+      y: player.pos.y,
+    });
+  });
+
+  player.onUpdate(() => {
+    // Prevent player from moving beyond the borders
+    if (player.pos.x < BORDER_WIDTH / 2) {
+      player.pos.x = BORDER_WIDTH / 2;
+    }
+    if (player.pos.x > (MAP_WIDTH - 0.4) * BORDER_WIDTH) {
+      player.pos.x = (MAP_WIDTH - 0.4) * BORDER_WIDTH;
+    }
+    if (player.pos.y < BORDER_WIDTH / 2) {
+      player.pos.y = BORDER_WIDTH / 2;
+    }
+    if (player.pos.y > (MAP_HEIGHT - 0.3) * BORDER_WIDTH) {
+      player.pos.y = (MAP_HEIGHT - 0.3) * BORDER_WIDTH;
+    }
+
+    k.camPos(player.pos);
+  });
+
+  k.camPos(player.pos);
+
+  k.onKeyDown("a", () => {
+    player.move(-SPEED, 0);
+  });
+
+  k.onKeyDown("d", () => {
+    player.move(SPEED, 0);
+  });
+
+  k.onKeyDown("w", () => {
+    player.move(0, -SPEED);
+  });
+
+  k.onKeyDown("s", () => {
+    player.move(0, SPEED);
   });
 });
 
-onKeyDown("a", () => {
-  player.move(-SPEED, 0);
-});
-
-onKeyDown("d", () => {
-  player.move(SPEED, 0);
-});
-
-onKeyDown("w", () => {
-  player.move(0, -SPEED);
-});
-
-onKeyDown("s", () => {
-  player.move(0, SPEED);
-});
-
-player.onUpdate(() => {
-  socket.emit("updatePosition", {
-    roomID: "main",
-    userID: user,
-    x: player.pos.x,
-    y: player.pos.y,
-  });
-});
+k.go("main");
