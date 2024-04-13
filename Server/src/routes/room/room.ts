@@ -1,4 +1,4 @@
-import { Db } from '@/database/dbConnection';
+import { Db } from '@/database/dbConnection.js';
 import express from 'express';
 
 const roomRoute = express.Router();
