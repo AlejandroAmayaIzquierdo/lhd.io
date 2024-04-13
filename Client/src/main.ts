@@ -9,7 +9,7 @@ interface PlayerData {
 }
 
 let WS_HOST = "http://localhost:3000";
-if (!__DEV__) WS_HOST = "WS_HOST=200.234.226.115:3000";
+if (!__DEV__) WS_HOST = "http://200.234.226.115:3000";
 
 const socket: Socket = io(WS_HOST);
 
