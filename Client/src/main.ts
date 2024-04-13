@@ -25,7 +25,7 @@ console.log(joinRoomData);
 socket.emit("joinRoom", joinRoomData);
 
 k.loadSprite("bean", "bean.png");
-const SPEED: number = 320;
+const SPEED: number = 350;
 
 // Add player game object
 const player = add([sprite("bean"), pos(0, 0)]) as any;
