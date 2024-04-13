@@ -95,8 +95,6 @@ export class Application {
     this.server.listen(PORT, () => {
       console.log(`Server listening to ${PORT} port 🚀`);
     });
-
-    console.log('a');
   };
 }
 

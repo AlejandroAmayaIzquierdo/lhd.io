@@ -31,13 +31,13 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
-          - name: Install SSH key
-            uses: webfactory/ssh-agent@v0.5.3
-            with:
-              ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
           - name: SSH into Server and Deploy
-            run: |
-              ssh -v ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && docker-compose pull && docker-compose up --build -d && exit"
+            uses: appleboy/ssh-action@v1.0.3
+            with:
+              host: ${{ secrets.SSH_HOST }}
+              username: ${{ secrets.SSH_USER }}
+              password: ${{ secrets.SSH_PASSWORD }}
+              script: cd ${{ secrets.WORK_DIR }} && docker-compose pull && docker-compose up --build -d && exit
+
           - name: cleanup
             run: rm -rf ~/.ssh
