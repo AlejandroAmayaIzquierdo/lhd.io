@@ -1,14 +1,14 @@
-name: Server Deployment
+name: Client Deployment
 
 on:
   push:
     branches: [ "deploy" ]
     paths:
-      - 'Server/**'
+      - 'Client/**'
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: alejandroamayaizquierdo/lhd.io:latest
+  IMAGE_NAME: alejandroamayaizquierdo/lhd.front.io:latest
 
 jobs:
     publish:
@@ -22,7 +22,7 @@ jobs:
             echo ${{ secrets.PAT }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
         - name: Build and d
           run: |
-            docker build Server --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+            docker build Client --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
             docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
     deploy:
@@ -37,7 +37,7 @@ jobs:
               host: ${{ secrets.SSH_HOST }}
               username: ${{ secrets.SSH_USER }}
               password: ${{ secrets.SSH_PASSWORD }}
-              script: cd ${{ secrets.SERVER_WORK_DIR }} && docker-compose pull && docker-compose up --build -d && exit
+              script: cd ${{ secrets.CLIENT_WORK_DIR }} && docker-compose pull && docker-compose up --build -d && exit
 
           - name: cleanup
             run: rm -rf ~/.ssh
