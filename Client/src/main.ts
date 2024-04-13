@@ -1,5 +1,6 @@
 import { io, Socket } from "socket.io-client";
 import k from "./Kaboom.js";
+declare const __DEV__: boolean;
 
 interface PlayerData {
   userID: number;
@@ -7,7 +8,10 @@ interface PlayerData {
   y: number;
 }
 
-const socket: Socket = io(`http://localhost:3000`);
+let WS_HOST = "http://localhost:3000";
+if (!__DEV__) WS_HOST = "WS_HOST=200.234.226.115:3000";
+
+const socket: Socket = io(WS_HOST);
 
 const user: number = Math.floor(Math.random() * 100);
 
