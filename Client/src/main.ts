@@ -125,6 +125,7 @@ export const loadGame = (k: KaboomCtx, playerName: string) => {
           (playerData) => playerData.userID === existingPlayer.userID
         );
         if (!playerStillInRoom) {
+          k.destroy(existingPlayer.label);
           k.destroy(existingPlayer); // Remove player from game
           users.splice(users.indexOf(existingPlayer), 1); // Remove player from array
         }
