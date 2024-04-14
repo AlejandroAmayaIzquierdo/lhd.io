@@ -21,13 +21,12 @@ export class SocketHandler {
       socket.on(
         'updatePosition',
         async (data: {
-          roomID: string;
           userID: string;
           x: number;
           y: number;
           visibleArea?: { width: number; height: number };
         }) => {
-          const room = RoomManager.getRoomById(data.roomID);
+          const room = RoomManager.isSocketOnAnyRoom(socket.id);
 
           if (!room) return;
 

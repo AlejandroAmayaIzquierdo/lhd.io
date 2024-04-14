@@ -72,7 +72,7 @@ export class Room {
         if (!player || !areaVisible || !playerPosition) return;
 
         const userVisibleToPlayer = players.filter((otherPlayer) => {
-          if (otherPlayer.userID === user.userId) return false; // Exclude current user
+          // if (otherPlayer.userID === user.userId) return false; // Exclude current user
 
           const otherPlayerPosition = this.game
             .getPlayer(otherPlayer.userID)
@@ -98,7 +98,7 @@ export class Room {
           .to(user.SocketId)
           .emit('updateRoom', { players: userVisibleToPlayer });
       });
-    }, 1000 / 60);
+    }, 1000 / 120);
   };
 
   public isDone = () => {

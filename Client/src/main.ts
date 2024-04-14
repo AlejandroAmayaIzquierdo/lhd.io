@@ -55,7 +55,7 @@ export const loadGame = (k: KaboomCtx, playerName: string) => {
     const MAP_HEIGHT = 10;
     const BORDER_WIDTH = 64;
 
-    const player = k.add([k.sprite("bean"), k.pos(0, 0)]);
+    const player = k.add([k.sprite("bean"), k.pos(0, 0), k.z(1)]);
 
     k.setBackground(25, 27, 28);
 
@@ -131,20 +131,17 @@ export const loadGame = (k: KaboomCtx, playerName: string) => {
         }
       });
     });
-
     player.onUpdate(() => {
       const visibleArea = {
         width: k.width(),
         height: k.height(),
       };
       let emitData: {
-        roomID: string;
         userID: string;
         x: number;
         y: number;
         visibleArea?: { width: number; height: number };
       } = {
-        roomID: "main",
         userID: `${playerName}-${user}`,
         x: player.pos.x,
         y: player.pos.y,
@@ -154,6 +151,7 @@ export const loadGame = (k: KaboomCtx, playerName: string) => {
         visibleArea.height !== prevVisibleArea.height ||
         visibleArea.width !== prevVisibleArea.width
       ) {
+        console.log("visible area change");
         emitData = { ...emitData, visibleArea };
         prevVisibleArea = visibleArea;
       }
