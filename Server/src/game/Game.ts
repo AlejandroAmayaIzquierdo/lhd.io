@@ -7,8 +7,13 @@ class Game {
     this.players = [];
   }
 
-  public spawnPlayer = (userID: string, x: number, y: number) => {
-    this.players.push(new Player(userID, x, y));
+  public spawnPlayer = (
+    userID: string,
+    visibleArea: App.VisibleArea,
+    x: number,
+    y: number,
+  ) => {
+    this.players.push(new Player(userID, visibleArea, x, y));
   };
 
   public destroyPlayer = (userID: string) => {
@@ -25,6 +30,8 @@ class Game {
     const p = this.players.find((e) => e.userID === userID);
     p?.move(x, y);
   };
+
+  public getPlayer = (id: string) => this.players.find((e) => e.userID === id);
 }
 
 export default Game;

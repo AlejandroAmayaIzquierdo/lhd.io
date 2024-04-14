@@ -12,12 +12,10 @@ document.addEventListener("DOMContentLoaded", function () {
   document
     .getElementById("startButton")
     ?.addEventListener("click", function () {
-      // Get the player name from the input field
       const playerNameInput = document.getElementById(
         "playerNameInput"
       ) as HTMLInputElement;
       const playerName = playerNameInput.value;
-      // Call the loadGame function and pass the player name
       loadGame(kaboom(), playerName);
     });
 });
@@ -32,12 +30,21 @@ export const loadGame = (k: KaboomCtx, playerName: string) => {
 
   const users: any[] = [];
 
+  let prevVisibleArea = {
+    width: k.width(),
+    height: k.height(),
+  };
+
   const joinRoomData = {
     lang: "es",
     roomId: "main",
     userId: `${playerName}-${user}`,
     userName: playerName,
     private: false,
+    visibleArea: {
+      width: k.width().toFixed(3),
+      height: k.height().toFixed(3),
+    },
   };
 
   k.loadSprite("bean", "bean.png");
@@ -70,7 +77,11 @@ export const loadGame = (k: KaboomCtx, playerName: string) => {
       pos: k.vec2(-BORDER_WIDTH / 2, -BORDER_WIDTH / 2),
       tiles: {
         "": () => [],
-        "=": () => [k.rect(BORDER_WIDTH, BORDER_WIDTH), k.color(0, 0, 0)],
+        "=": () => [
+          k.rect(BORDER_WIDTH, BORDER_WIDTH),
+          k.color(255, 255, 255),
+          k.outline(4),
+        ],
       },
     });
 
@@ -121,12 +132,32 @@ export const loadGame = (k: KaboomCtx, playerName: string) => {
     });
 
     player.onUpdate(() => {
-      socket.emit("updatePosition", {
+      const visibleArea = {
+        width: k.width(),
+        height: k.height(),
+      };
+      let emitData: {
+        roomID: string;
+        userID: string;
+        x: number;
+        y: number;
+        visibleArea?: { width: number; height: number };
+      } = {
         roomID: "main",
         userID: `${playerName}-${user}`,
         x: player.pos.x,
         y: player.pos.y,
-      });
+      };
+
+      if (
+        visibleArea.height !== prevVisibleArea.height ||
+        visibleArea.width !== prevVisibleArea.width
+      ) {
+        emitData = { ...emitData, visibleArea };
+        prevVisibleArea = visibleArea;
+      }
+
+      socket.emit("updatePosition", emitData);
     });
 
     player.onUpdate(() => {

@@ -4,6 +4,11 @@ declare namespace App {
     handle();
   }
 
+  interface VisibleArea {
+    width: number;
+    height: number;
+  }
+
   interface DbCron {
     id: number;
     name: string;
@@ -68,6 +73,7 @@ declare namespace Api {
     SocketId?: string;
     profilePic?: string;
     profileName?: string;
+    visibleArea?: App.VisibleArea;
   }
   interface Room {
     id: number;
@@ -88,6 +94,7 @@ declare namespace Api {
   }
   interface JoinRoomData extends SearchRoomBody {
     roomId: string;
+    visibleArea: App.VisibleArea;
   }
   interface OAuth2Google {
     access_token: string;

@@ -14,15 +14,29 @@ export class SocketHandler {
           userId: data.userId,
           userName: data.userName,
           SocketId: socket.id,
+          visibleArea: data.visibleArea,
         });
       });
 
       socket.on(
         'updatePosition',
-        async (data: { roomID: string; userID: string; x: number; y: number }) => {
+        async (data: {
+          roomID: string;
+          userID: string;
+          x: number;
+          y: number;
+          visibleArea?: { width: number; height: number };
+        }) => {
           const room = RoomManager.getRoomById(data.roomID);
 
-          if (room) room.getGame().movePlayer(data.userID, data.x, data.y);
+          if (!room) return;
+
+          const game = room.getGame();
+
+          if (data.visibleArea)
+            game.getPlayer(data.userID)?.setVisibleArea(data.visibleArea);
+
+          room.getGame().movePlayer(data.userID, data.x, data.y);
         },
       );
 

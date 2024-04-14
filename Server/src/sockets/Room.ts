@@ -34,7 +34,7 @@ export class Room {
     if (!isUserOnRoom) this.usersInfo.push(user);
     Application.io.to(this.id).emit('joinedRoom', this.usersInfo);
 
-    this.game.spawnPlayer(user.userId, 0, 0);
+    if (user.visibleArea) this.game.spawnPlayer(user.userId, user.visibleArea, 0, 0);
 
     console.log('User joined', user.userId);
 
@@ -61,7 +61,43 @@ export class Room {
 
   public handle = () => {
     this.interval = setInterval(async () => {
-      Application.io.to(this.id).emit('updateRoom', this.game.getGameData());
+      const { players } = this.game.getGameData();
+      this.usersInfo.forEach((user) => {
+        if (!user.SocketId) return;
+
+        const player = this.game.getPlayer(user.userId);
+        const playerPosition = player?.getPosition(); // {x,y}
+        const areaVisible = player?.getVisibleArea(); // radius
+
+        if (!player || !areaVisible || !playerPosition) return;
+
+        const userVisibleToPlayer = players.filter((otherPlayer) => {
+          if (otherPlayer.userID === user.userId) return false; // Exclude current user
+
+          const otherPlayerPosition = this.game
+            .getPlayer(otherPlayer.userID)
+            ?.getPosition();
+
+          if (!otherPlayerPosition) return false;
+
+          // distance between players
+          const distance = Math.sqrt(
+            Math.pow(playerPosition.x - otherPlayerPosition.x, 2) +
+              Math.pow(playerPosition.y - otherPlayerPosition.y, 2),
+          );
+
+          // Check if otherPlayer is within the visible area of the current user
+          return distance < areaVisible;
+        });
+
+        // console.log(
+        //   `Player visible by ${user.userId}: ${userVisibleToPlayer.length}`,
+        // );
+
+        Application.io
+          .to(user.SocketId)
+          .emit('updateRoom', { players: userVisibleToPlayer });
+      });
     }, 1000 / 60);
   };
 
@@ -81,18 +117,14 @@ export class Room {
     await Db.getInstance().query(
       `UPDATE rooms SET users="${this.usersInfo
         .map((e) => e.userId)
-        .join(
-          ',',
-        )}",isActive=0,isEnded=1,endedAt="${formattedDate}" WHERE id="${
+        .join(',')}",isActive=0,isEnded=1,endedAt="${formattedDate}" WHERE id="${
         this.id
       }"`,
     );
     RoomManager.removeRoom(this.id);
   };
 
-  public static doesRoomShouldEnd = async (
-    room: Api.Room,
-  ): Promise<boolean> => {
+  public static doesRoomShouldEnd = async (room: Api.Room): Promise<boolean> => {
     try {
       const { createdAt } = room;
 
