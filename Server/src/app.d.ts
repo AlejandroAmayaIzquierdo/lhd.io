@@ -22,6 +22,11 @@ declare namespace App {
     path: string;
     hash: string;
   }
+
+  interface message {
+    e: int;
+    d: unknown;
+  }
 }
 
 /// <reference types="lucia" />
@@ -52,6 +57,7 @@ declare namespace Lucia {
 }
 
 /// <reference types="Api" />
+
 declare namespace Api {
   interface Response {
     status: number;
@@ -70,7 +76,7 @@ declare namespace Api {
   interface User {
     userName: string;
     userId: string;
-    SocketId?: string;
+    socket?: import('ws').WebSocket;
     profilePic?: string;
     profileName?: string;
     visibleArea?: App.VisibleArea;

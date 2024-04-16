@@ -1,6 +1,5 @@
 ﻿import Game from '@/game/Game.js';
 import { Db } from '../database/dbConnection.js';
-import { Application } from '../index.js';
 import { RoomManager } from './RoomManager.js';
 
 export class Room {
@@ -32,7 +31,7 @@ export class Room {
   public join = async (user: Api.User) => {
     const isUserOnRoom = this.usersInfo.find((e) => e.userId === user.userId);
     if (!isUserOnRoom) this.usersInfo.push(user);
-    Application.io.to(this.id).emit('joinedRoom', this.usersInfo);
+    // Application.io.to(this.id).emit('joinedRoom', this.usersInfo);
 
     if (user.visibleArea) this.game.spawnPlayer(user.userId, user.visibleArea, 0, 0);
 
@@ -54,7 +53,7 @@ export class Room {
 
     this.usersInfo = this.usersInfo.filter((e) => e.userId !== user.userId);
     this.game.destroyPlayer(user.userId);
-    Application.io.to(this.id).emit('leavedRoom', user);
+    // Application.io.to(this.id).emit('leavedRoom', user);
 
     // if (this.usersInfo.length <= 1) this.done();
   };
@@ -63,7 +62,7 @@ export class Room {
     this.interval = setInterval(async () => {
       const { players } = this.game.getGameData();
       this.usersInfo.forEach((user) => {
-        if (!user.SocketId) return;
+        if (!user.socket) return;
 
         const player = this.game.getPlayer(user.userId);
         const playerPosition = player?.getPosition(); // {x,y}
@@ -93,10 +92,8 @@ export class Room {
         // console.log(
         //   `Player visible by ${user.userId}: ${userVisibleToPlayer.length}`,
         // );
-
-        Application.io
-          .to(user.SocketId)
-          .emit('updateRoom', { players: userVisibleToPlayer });
+        user.socket.send(JSON.stringify({ players: userVisibleToPlayer }));
+        // Application.io.to(user.socket).emit();
       });
     }, 1000 / 120);
   };

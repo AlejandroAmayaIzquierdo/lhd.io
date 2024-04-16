@@ -1,13 +1,14 @@
 ﻿import { Db } from '../database/dbConnection.js';
 import { Room } from './Room.js';
-import { Socket as socketIO } from 'socket.io';
 import { SocketHandler } from './Sockets.js';
+
+import WebSocket from 'ws';
 
 export class RoomManager {
   public static rooms: Room[] = [];
 
   public static joinRoom = async (
-    socket: socketIO,
+    socket: WebSocket,
     roomID: string,
     user: Api.User,
   ) => {
@@ -24,8 +25,7 @@ export class RoomManager {
         const isRoomCreated = this.rooms.find((e) => e.getID() === roomID);
         if (isRoomCreated) {
           console.log('Room already created');
-          socket.join(isRoomCreated.getID());
-          isRoomCreated.join({ ...user, SocketId: socket.id });
+          isRoomCreated.join({ ...user, socket: socket });
           console.log(isRoomCreated);
         } else {
           console.log('Room not created');
@@ -48,12 +48,12 @@ export class RoomManager {
     });
   };
 
-  public static isSocketOnAnyRoom = (socketID: string) => {
+  public static isSocketOnAnyRoom = (socket: WebSocket) => {
     return RoomManager.rooms.find((e) => {
       const users = e.getPlayers();
 
       return users.find((j) => {
-        return j.SocketId === socketID;
+        return j.socket === socket;
       });
     });
   };
@@ -66,14 +66,14 @@ export class RoomManager {
   }
 
   private static createRoom = async (
-    socket: socketIO,
+    socket: WebSocket,
     roomID: string,
     user: Api.User,
   ) => {
     console.log('CreatingRoom');
-    const room = new Room(roomID, [{ ...user, SocketId: socket.id }]);
-    socket.join(`${roomID}`);
-    room.join({ ...user, SocketId: socket.id });
+    const room = new Room(roomID, [{ ...user, socket }]);
+
+    room.join({ ...user, socket });
 
     this.rooms.push(room);
   };

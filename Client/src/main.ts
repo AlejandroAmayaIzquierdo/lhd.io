@@ -21,10 +21,10 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 export const loadGame = (k: KaboomCtx, playerName: string) => {
-  let WS_HOST = "http://localhost:3000";
+  let WS_HOST = "ws://localhost:3000";
   if (!__DEV__) WS_HOST = "http://200.234.226.115:3000";
 
-  const socket: Socket = io(WS_HOST);
+  const socket = new WebSocket(WS_HOST);
 
   const user: number = Math.floor(Math.random() * 100);
 
@@ -85,12 +85,14 @@ export const loadGame = (k: KaboomCtx, playerName: string) => {
       },
     });
 
-    socket.emit("joinRoom", joinRoomData);
+    socket.addEventListener("open", () => {
+      socket.send(JSON.stringify({ e: 0, d: joinRoomData }));
+    });
 
-    socket.on("updateRoom", (data: { players: PlayerData[] }) => {
+    socket.addEventListener("message", (event) => {
+      const data = JSON.parse(event.data);
       const playersData: PlayerData[] = data.players;
 
-      // Iterate through each player in the room
       for (const playerData of playersData) {
         const existingPlayer = users.find(
           (user) => user.userID === playerData.userID
@@ -119,7 +121,6 @@ export const loadGame = (k: KaboomCtx, playerName: string) => {
         }
       }
 
-      // Check for players that have left the room
       users.forEach((existingPlayer) => {
         const playerStillInRoom = playersData.find(
           (playerData) => playerData.userID === existingPlayer.userID
@@ -131,6 +132,15 @@ export const loadGame = (k: KaboomCtx, playerName: string) => {
         }
       });
     });
+
+    socket.addEventListener("error", (error) => {
+      console.error("WebSocket error:", error);
+    });
+
+    socket.addEventListener("close", () => {
+      console.log("WebSocket connection closed.");
+    });
+
     player.onUpdate(() => {
       const visibleArea = {
         width: k.width(),
@@ -156,7 +166,7 @@ export const loadGame = (k: KaboomCtx, playerName: string) => {
         prevVisibleArea = visibleArea;
       }
 
-      socket.emit("updatePosition", emitData);
+      socket.send(JSON.stringify({ e: 1, d: emitData }));
     });
 
     player.onUpdate(() => {
