@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 export const loadGame = (k: KaboomCtx, playerName: string) => {
   let WS_HOST = "ws://localhost:3000";
-  if (!__DEV__) WS_HOST = "http://200.234.226.115:3000";
+  if (!__DEV__) WS_HOST = "ws://200.234.226.115:3000";
 
   const socket = new WebSocket(WS_HOST);
 
