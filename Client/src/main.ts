@@ -87,6 +87,34 @@ export const loadGame = (k: KaboomCtx, playerName: string) => {
 
     socket.addEventListener("open", () => {
       socket.send(JSON.stringify({ e: 0, d: joinRoomData }));
+
+      player.onUpdate(() => {
+        const visibleArea = {
+          width: k.width(),
+          height: k.height(),
+        };
+        let emitData: {
+          userID: string;
+          x: number;
+          y: number;
+          visibleArea?: { width: number; height: number };
+        } = {
+          userID: `${playerName}-${user}`,
+          x: player.pos.x,
+          y: player.pos.y,
+        };
+
+        if (
+          visibleArea.height !== prevVisibleArea.height ||
+          visibleArea.width !== prevVisibleArea.width
+        ) {
+          console.log("visible area change");
+          emitData = { ...emitData, visibleArea };
+          prevVisibleArea = visibleArea;
+        }
+
+        socket.send(JSON.stringify({ e: 1, d: emitData }));
+      });
     });
 
     socket.addEventListener("message", (event) => {
@@ -139,34 +167,6 @@ export const loadGame = (k: KaboomCtx, playerName: string) => {
 
     socket.addEventListener("close", () => {
       console.log("WebSocket connection closed.");
-    });
-
-    player.onUpdate(() => {
-      const visibleArea = {
-        width: k.width(),
-        height: k.height(),
-      };
-      let emitData: {
-        userID: string;
-        x: number;
-        y: number;
-        visibleArea?: { width: number; height: number };
-      } = {
-        userID: `${playerName}-${user}`,
-        x: player.pos.x,
-        y: player.pos.y,
-      };
-
-      if (
-        visibleArea.height !== prevVisibleArea.height ||
-        visibleArea.width !== prevVisibleArea.width
-      ) {
-        console.log("visible area change");
-        emitData = { ...emitData, visibleArea };
-        prevVisibleArea = visibleArea;
-      }
-
-      socket.send(JSON.stringify({ e: 1, d: emitData }));
     });
 
     player.onUpdate(() => {
