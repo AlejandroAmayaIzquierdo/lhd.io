@@ -13,7 +13,7 @@ export class Room {
 
   private game: Game;
 
-  public static readonly MAX_TIME_BY_ROOM: number = 1800; // 30 minutes
+  public static readonly MAX_TIME_BY_ROOM: number = 1800;
   public static readonly MAX_USER: number = 2;
 
   public constructor(roomID: string, players?: Api.User[]) {
@@ -60,7 +60,8 @@ export class Room {
 
   public handle = () => {
     this.interval = setInterval(async () => {
-      const { players } = this.game.getGameData();
+      const players = this.game.getPlayers();
+      const entities = this.game.getEntities();
       this.usersInfo.forEach((user) => {
         if (!user.socket) return;
 
@@ -71,7 +72,7 @@ export class Room {
         if (!player || !areaVisible || !playerPosition) return;
 
         const userVisibleToPlayer = players.filter((otherPlayer) => {
-          // if (otherPlayer.userID === user.userId) return false; // Exclude current user
+          if (otherPlayer.userID === user.userId) return false; // Exclude current user
 
           const otherPlayerPosition = this.game
             .getPlayer(otherPlayer.userID)
@@ -89,11 +90,25 @@ export class Room {
           return distance < areaVisible;
         });
 
-        // console.log(
-        //   `Player visible by ${user.userId}: ${userVisibleToPlayer.length}`,
-        // );
-        user.socket.send(JSON.stringify({ players: userVisibleToPlayer }));
-        // Application.io.to(user.socket).emit();
+        const entitiesVisible = entities.filter((entity) => {
+          const entityPosition = entity.getPosition();
+
+          if (!entityPosition) return false;
+
+          // distance between players
+          const distance = Math.sqrt(
+            Math.pow(playerPosition.x - entityPosition.x, 2) +
+              Math.pow(playerPosition.y - entityPosition.y, 2),
+          );
+          return distance < areaVisible;
+        });
+
+        user.socket.send(
+          JSON.stringify({
+            e: 0,
+            d: { players: userVisibleToPlayer, entities: entitiesVisible },
+          }),
+        );
       });
     }, 1000 / 120);
   };

@@ -6,6 +6,8 @@ class Player {
 
   private visibleArea: App.VisibleArea;
 
+  private visibleRadius: number = 0;
+
   public constructor(
     userID: string,
     visibleArea: App.VisibleArea,
@@ -17,6 +19,11 @@ class Player {
     else this.move(0, 0);
 
     this.visibleArea = visibleArea;
+    const diagonalLength = Math.sqrt(
+      this.visibleArea.width ** 2 + this.visibleArea.height ** 2,
+    );
+    const radius = diagonalLength / 2;
+    this.visibleRadius = radius;
   }
 
   public move(x: number, y: number) {
@@ -32,11 +39,7 @@ class Player {
   }
 
   public getVisibleArea(): number {
-    const diagonalLength = Math.sqrt(
-      this.visibleArea.width ** 2 + this.visibleArea.height ** 2,
-    );
-    const radius = diagonalLength / 2;
-    return radius;
+    return this.visibleRadius;
   }
 
   public setVisibleArea(area: App.VisibleArea) {

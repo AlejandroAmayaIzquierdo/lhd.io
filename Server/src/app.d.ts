@@ -29,6 +29,15 @@ declare namespace App {
   }
 }
 
+declare namespace Game {
+  interface Entity {
+    x: number;
+    y: number;
+    onCollide(other: Entity);
+    getPosition(): { x: number; y: number };
+  }
+}
+
 /// <reference types="lucia" />
 declare namespace Lucia {
   type Auth = import('./lucia.js').Auth;

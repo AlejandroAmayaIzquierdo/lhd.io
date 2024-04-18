@@ -1,4 +1,3 @@
-import { io, Socket } from "socket.io-client";
 import kaboom, { KaboomCtx } from "kaboom";
 declare const __DEV__: boolean;
 
@@ -47,15 +46,79 @@ export const loadGame = (k: KaboomCtx, playerName: string) => {
     },
   };
 
+  // k.debug.inspect = true;
+
   k.loadSprite("bean", "bean.png");
+  k.loadSpriteAtlas("Slime/idle.png", {
+    SlimeIdle: {
+      x: 0,
+      y: 0,
+      width: 64,
+      height: 14,
+      sliceX: 4,
+      sliceY: 1,
+      anims: {
+        idle: {
+          from: 0,
+          to: 3,
+          speed: 4,
+          loop: true,
+        },
+      },
+    },
+  });
+  k.loadSpriteAtlas("Slime/jump1.png", {
+    SlimeJump1: {
+      x: 0,
+      y: 0,
+      width: 126,
+      height: 24,
+      sliceX: 7,
+      sliceY: 1,
+      anims: {
+        jump1: {
+          from: 0,
+          to: 6,
+          speed: 5,
+          loop: true,
+        },
+      },
+    },
+  });
 
   k.scene("main", () => {
     const SPEED: number = 480;
     const MAP_WIDTH = 20;
-    const MAP_HEIGHT = 10;
+    const MAP_HEIGHT = 20;
     const BORDER_WIDTH = 64;
 
-    const player = k.add([k.sprite("bean"), k.pos(0, 0), k.z(1)]);
+    // const player = k.add([k.sprite("bean"), k.pos(0, 0), k.z(1)]);
+
+    let player = k.add([
+      k.sprite("SlimeIdle", { anim: "idle" }),
+      k.scale(5),
+      k.pos(0, 0),
+      k.z(1),
+      k.anchor("center"),
+    ]);
+
+    k.add([
+      k.sprite("SlimeJump1", { anim: "jump1" }),
+      k.scale(5),
+      k.pos(100, 100),
+      k.z(1),
+    ]);
+
+    // player.onKeyDown("space", () => {
+    //   // Remove the existing sprite component
+    //   player;
+
+    //   // Load a new sprite and add it to the player entity
+    //   player.add([k.sprite("SlimeJump1", { anim: "jump1" })]);
+
+    //   // Play the animation of the new sprite
+    //   // player.play("jump1");
+    // });
 
     k.setBackground(25, 27, 28);
 
@@ -77,11 +140,7 @@ export const loadGame = (k: KaboomCtx, playerName: string) => {
       pos: k.vec2(-BORDER_WIDTH / 2, -BORDER_WIDTH / 2),
       tiles: {
         "": () => [],
-        "=": () => [
-          k.rect(BORDER_WIDTH, BORDER_WIDTH),
-          k.color(255, 255, 255),
-          k.outline(4),
-        ],
+        "=": () => [k.rect(BORDER_WIDTH, BORDER_WIDTH), k.color(255, 255, 255)],
       },
     });
 
@@ -118,55 +177,71 @@ export const loadGame = (k: KaboomCtx, playerName: string) => {
     });
 
     socket.addEventListener("message", (event) => {
-      const data = JSON.parse(event.data);
-      const playersData: PlayerData[] = data.players;
+      const data = JSON.parse(event.data) as { e: number; d: unknown };
 
-      for (const playerData of playersData) {
-        const existingPlayer = users.find(
-          (user) => user.userID === playerData.userID
-        );
+      switch (data.e) {
+        case 0:
+          const { players } = data.d as {
+            players: PlayerData[];
+            entities?: { x: number; y: number }[];
+          };
 
-        if (!existingPlayer) {
-          const newPlayer = k.add([
-            k.sprite("bean"),
-            k.pos(playerData.x, playerData.y),
-          ]) as any;
-          newPlayer.userID = playerData.userID;
+          // console.log(entities);
 
-          const label = k.add([
-            k.text(`${playerData.userID}`.split("-")[0]),
-            k.pos(player.pos.x + player.width / 2, player.pos.y - 20),
-            k.anchor("center"),
-          ]);
-          newPlayer.label = label;
-          users.push(newPlayer);
-        } else {
-          existingPlayer.pos.x = playerData.x;
-          existingPlayer.pos.y = playerData.y;
+          for (const playerData of players) {
+            const existingPlayer = users.find(
+              (user) => user.userID === playerData.userID
+            );
 
-          existingPlayer.label.pos.x = playerData.x + existingPlayer.width / 2;
-          existingPlayer.label.pos.y = playerData.y - 20;
-        }
+            if (!existingPlayer) {
+              const newPlayer = k.add([
+                k.sprite("SlimeIdle", { anim: "idle" }),
+                k.scale(5),
+                k.pos(playerData.x, playerData.y),
+                k.anchor("center"),
+              ]) as any;
+              newPlayer.userID = playerData.userID;
+
+              const label = k.add([
+                k.text(`${playerData.userID}`.split("-")[0]),
+                k.pos(newPlayer.pos.x, newPlayer.pos.y - 200),
+                k.anchor("center"),
+              ]);
+              newPlayer.label = label;
+              users.push(newPlayer);
+            } else {
+              existingPlayer.pos.x = playerData.x;
+              existingPlayer.pos.y = playerData.y;
+
+              existingPlayer.label.pos.x =
+                playerData.x + existingPlayer.width / 2;
+              existingPlayer.label.pos.y = playerData.y - 20;
+            }
+          }
+
+          users.forEach((existingPlayer) => {
+            const playerStillInRoom = players.find(
+              (players) => players.userID === existingPlayer.userID
+            );
+            if (!playerStillInRoom) {
+              k.destroy(existingPlayer.label);
+              k.destroy(existingPlayer); // Remove player from game
+              users.splice(users.indexOf(existingPlayer), 1);
+            }
+          });
+          break;
+
+        default:
+          break;
       }
-
-      users.forEach((existingPlayer) => {
-        const playerStillInRoom = playersData.find(
-          (playerData) => playerData.userID === existingPlayer.userID
-        );
-        if (!playerStillInRoom) {
-          k.destroy(existingPlayer.label);
-          k.destroy(existingPlayer); // Remove player from game
-          users.splice(users.indexOf(existingPlayer), 1); // Remove player from array
-        }
-      });
     });
 
     socket.addEventListener("error", (error) => {
-      console.error("WebSocket error:", error);
+      k.go("Diconected");
     });
 
     socket.addEventListener("close", () => {
-      console.log("WebSocket connection closed.");
+      k.go("Diconected");
     });
 
     player.onUpdate(() => {
@@ -204,6 +279,19 @@ export const loadGame = (k: KaboomCtx, playerName: string) => {
     k.onKeyDown("s", () => {
       player.move(0, SPEED);
     });
+  });
+
+  k.scene("Diconected", () => {
+    k.setBackground(25, 27, 28);
+
+    k.add([
+      k.text("Diconected from the server, please refresh the page", {
+        size: k.width() * 0.03,
+      }),
+      k.pos(k.width() / 2, k.height() / 2),
+      k.anchor("center"),
+      k.fixed(),
+    ]);
   });
 
   k.go("main");

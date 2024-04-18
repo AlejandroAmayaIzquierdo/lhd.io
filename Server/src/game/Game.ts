@@ -1,10 +1,19 @@
+import { LuckyBox } from './LuckyBox.js';
 import Player from './Player.js';
 
 class Game {
   private players: Player[];
 
+  private entities: Game.Entity[] = [];
+
+  public static readonly MAX_ENTITIES_BY_GAME = 20;
+
   public constructor() {
     this.players = [];
+
+    for (let i = 0; i < Game.MAX_ENTITIES_BY_GAME; i++) {
+      this.entities.push(new LuckyBox());
+    }
   }
 
   public spawnPlayer = (
@@ -32,6 +41,8 @@ class Game {
   };
 
   public getPlayer = (id: string) => this.players.find((e) => e.userID === id);
+  public getPlayers = () => this.players;
+  public getEntities = () => this.entities;
 }
 
 export default Game;
