@@ -168,7 +168,7 @@ export class GameScene implements GAME.Scene {
       emitData = { ...emitData, visibleArea };
       playerInstance.prevVisibleArea = visibleArea;
     }
-
-    Game.socket.send(JSON.stringify({ e: 1, d: emitData }));
+    if (Game.socket.readyState === Game.socket.OPEN)
+      Game.socket.send(JSON.stringify({ e: 1, d: emitData }));
   };
 }
