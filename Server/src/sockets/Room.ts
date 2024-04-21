@@ -1,6 +1,7 @@
 ﻿import Game from '@/game/Game.js';
 import { Db } from '../database/dbConnection.js';
 import { RoomManager } from './RoomManager.js';
+import Player from '@/game/Player.js';
 
 export class Room {
   private id: string;
@@ -89,7 +90,6 @@ export class Room {
           // Check if otherPlayer is within the visible area of the current user
           return distance < areaVisible;
         });
-
         const entitiesVisible = entities.filter((entity) => {
           const entityPosition = entity.getPosition();
 
@@ -103,10 +103,17 @@ export class Room {
           return distance < areaVisible;
         });
 
+        let payload: { players: Player[]; entities?: Game.Entity[] } = {
+          players: userVisibleToPlayer,
+        };
+
+        if (entitiesVisible.length > 0)
+          payload = { ...payload, entities: entitiesVisible };
+
         user.socket.send(
           JSON.stringify({
             e: 0,
-            d: { players: userVisibleToPlayer, entities: entitiesVisible },
+            d: payload,
           }),
         );
       });
