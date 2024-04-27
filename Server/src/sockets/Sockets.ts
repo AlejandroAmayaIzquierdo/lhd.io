@@ -22,6 +22,13 @@ export class SocketHandler {
             socket,
             visibleArea: message.visibleArea,
           });
+
+          wsServer.clients.forEach((client) => {
+            if (client !== socket)
+              client.send(
+                JSON.stringify({ e: 1, d: `${message.userName} Join the Game` }),
+              );
+          });
         } else if (e === 1) {
           const message = d as {
             userID: string;
