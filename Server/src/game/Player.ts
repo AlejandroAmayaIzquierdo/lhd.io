@@ -8,7 +8,7 @@ class Player {
 
   private visibleRadius: number = 0;
 
-  private rock: { x: number; y: number } = { x: 950, y: -20 };
+  public rock: { x: number; y: number } = { x: 950, y: -20 };
 
   public constructor(
     userID: string,
