@@ -14,6 +14,7 @@ No es la gran cosa pero con suerte el concepto esta gracioso.
 <br>
 <br>
 <br>
-ps: Kaboom.js esta bien para desarrollos simples pero para cosas más complejas se hace pesado, si quieren usarlo tenganlo en cuenta. Incluso este projecto que no es muy complejo me genero muchos problemas.
+ps: Kaboom.js esta bien para desarrollos simples pero para cosas más complejas se hace pesado. Si quieren usarlo tenganlo en cuenta.<br>
+Incluso este projecto que no es muy complejo me genero muchos problemas.
 <br>
 ![suffering-pain](https://github.com/AlejandroAmayaIzquierdo/lhd.io/assets/96839165/b8fc83a5-6c44-4830-9ded-9b440af0a253)
