@@ -8,7 +8,7 @@ Juego online basado en el mito de Sisyphus. Usa Kaboom.js en el front y express 
 <br>
 La idea era hacer un clon de agar.io pero se tenso la cosa.
 <br>
-No es la gran cosa pero con suerte el concepto esta gracioso.
+No es la gran cosa y le falta desarrollo pero con suerte el concepto esta gracioso.
 <br>
 <br>
 <br>
