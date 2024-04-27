@@ -24,5 +24,19 @@ document.addEventListener("DOMContentLoaded", function () {
         const g = Game.StartGame(playerName, debugInput.checked);
         g.changeScene(new GameScene());
       }
+
+      const audioIcon = document.getElementById(
+        "audioIcon"
+      ) as HTMLInputElement;
+
+      audioIcon.style["opacity"] = "100";
+      audioIcon.style["display"] = "block";
+
+      audioIcon.addEventListener("click", function () {
+        GameScene.isMute = !GameScene.isMute;
+        audioIcon.src = GameScene.isMute
+          ? "/audio-off-svgrepo-com.svg"
+          : "/audio-svgrepo-com.svg";
+      });
     });
 });

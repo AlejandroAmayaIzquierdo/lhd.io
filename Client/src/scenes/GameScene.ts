@@ -25,6 +25,8 @@ export class GameScene implements GAME.Scene {
 
   public static music = new Audio("/Duster-Me and the birds.mp3");
 
+  public static isMute = false;
+
   private static rock:
     | GameObj<
         | SpriteComp
@@ -84,7 +86,7 @@ export class GameScene implements GAME.Scene {
     Game.context.onKeyDown("space", () => {
       if (GameScene?.rock?.isColliding(player.obj)) {
         this.isPushing = true;
-        GameScene.music.play();
+        if (!GameScene.isMute) GameScene.music.play();
         const p = Player.getInstance().obj;
         if (p.curAnim() !== "push") p.play("push");
         if (GameScene.rock?.pos.y > -5450)
