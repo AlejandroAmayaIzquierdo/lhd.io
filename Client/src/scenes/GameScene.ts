@@ -68,6 +68,12 @@ export class GameScene implements GAME.Scene {
       k.rotate(63.5),
     ]);
 
+    GameScene.rock.onUpdate(() => {
+      if (GameScene.rock && GameScene.rock?.pos.y < -5400) {
+        GameScene.rock.angle = 0;
+      }
+    });
+
     Game.context.onKeyDown("a", () => {
       player.obj.move(-Player.SPEED, 0);
     });
@@ -96,7 +102,9 @@ export class GameScene implements GAME.Scene {
         GameScene.music.play();
         const p = Player.getInstance().obj;
         if (p.curAnim() !== "push") p.play("push");
-        GameScene?.rock.move(GameScene.ROCK_SPEED, -GameScene.ROCK_SPEED / 2);
+        if (GameScene.rock?.pos.y > -5450)
+          GameScene?.rock.move(GameScene.ROCK_SPEED, -GameScene.ROCK_SPEED / 2);
+        else GameScene?.rock.move(GameScene.ROCK_SPEED, 0);
       }
     });
 
