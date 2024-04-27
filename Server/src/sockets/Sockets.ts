@@ -43,6 +43,10 @@ export class SocketHandler {
           wsServer.clients.forEach((client) => {
             client.send(JSON.stringify({ e: 2, d }));
           });
+        } else if (e === 3) {
+          wsServer.clients.forEach((client) => {
+            client.send(JSON.stringify({ e: 1, d: `${d} Just reach the top` }));
+          });
         }
       });
 

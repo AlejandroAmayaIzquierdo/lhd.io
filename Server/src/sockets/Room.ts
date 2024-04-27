@@ -71,12 +71,6 @@ export class Room {
 
         if (!player || !areaVisible || !playerPosition) return;
 
-        if (playerPosition.y <= -5390) {
-          this.usersInfo.forEach((e) => {
-            e.socket?.send(JSON.stringify({ e: 1, d: `${player.userID} Just Won` }));
-          });
-        }
-
         const userVisibleToPlayer = players.filter((otherPlayer) => {
           if (otherPlayer.userID === user.userId) return false; // Exclude current user
 

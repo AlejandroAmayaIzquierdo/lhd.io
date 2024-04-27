@@ -81,21 +81,6 @@ export class GameScene implements GAME.Scene {
       player.obj.move(Player.SPEED, 0);
     });
 
-    // Game.context.onKeyPress("space", () => {
-    //   if (!GameScene?.rock) return;
-    //   console.log(
-    //     "Is colliding with player",
-    //     GameScene?.rock.isColliding(player.obj)
-    //   );
-    //   if (GameScene?.rock.isColliding(player.obj)) this.isPushing = true;
-    // });
-
-    // k.loop(0.5, () => {
-    //   if (!this.isPushing && GameScene.rock && GameScene?.rock?.pos?.y < -20) {
-    //     GameScene?.rock?.move(-2000, 2000 / 2);
-    //   }
-    // });
-
     Game.context.onKeyDown("space", () => {
       if (GameScene?.rock?.isColliding(player.obj)) {
         this.isPushing = true;
@@ -133,7 +118,6 @@ export class GameScene implements GAME.Scene {
           const { players } = data.d as GAME.PayLoadUpdateEvent;
 
           for (const playerData of players) {
-            // console.log(playerData.userID);
             const existingPlayer = GameScene.users.find(
               (user) => user.userID === playerData.userID
             );
@@ -193,10 +177,7 @@ export class GameScene implements GAME.Scene {
 
           break;
         case 1:
-          k.debug.log(data.d as string);
-          break;
         case 2:
-          console.log(data.d);
           Game.appendChatMessage(data.d as string);
           break;
         default:
@@ -206,34 +187,7 @@ export class GameScene implements GAME.Scene {
   };
 
   public static buildLevel() {
-    // const topBorder = "=".repeat(GameScene.MAP_WIDTH + 2);
-    // const middleSpace = `=${" ".repeat(GameScene.MAP_WIDTH)}=`;
-    // const bottomBorder = "=".repeat(GameScene.MAP_WIDTH + 2);
-
-    // const mapDefinition = [topBorder];
-
-    // for (let i = 0; i < GameScene.MAP_HEIGHT; i++) {
-    //   mapDefinition.push(middleSpace);
-    // }
-
-    // mapDefinition.push(bottomBorder);
-
     const k = Game.context;
-
-    // k.addLevel(mapDefinition, {
-    //   tileHeight: GameScene.BORDER_WIDTH,
-    //   tileWidth: GameScene.BORDER_WIDTH,
-    //   pos: k.vec2(-GameScene.BORDER_WIDTH / 2, -GameScene.BORDER_WIDTH / 2),
-    //   tiles: {
-    //     "": () => [],
-    //     "=": () => [
-    //       k.rect(GameScene.BORDER_WIDTH, GameScene.BORDER_WIDTH),
-    //       k.color(255, 255, 255),
-    //       k.area(),
-    //       k.body({ isStatic: true }),
-    //     ],
-    //   },
-    // });
 
     k.add([
       k.rect(k.width() * 2, k.height()),
@@ -249,18 +203,9 @@ export class GameScene implements GAME.Scene {
       k.scale(2), // Adjust scale as needed
       k.color(255, 255, 255), // Adjust color as needed
     ]);
-    // const xOffset = 6150;
-    // const yOffset = 2695;
-    // let x = 900;
-    // let y = 100;
-    // for (let i = 0; i < 2; i++) {
-    //   GameScene.addRamp(x, y, k.height(), 6150, 63.5);
-    //   x += xOffset;
-    //   y += yOffset;
-    // }
     GameScene.addRamp(900, 100, k.height(), 6150, 63.5);
     GameScene.addRamp(6300, -2595, k.height(), 6150, 63.5);
-    const topPlatform = k.add([
+    k.add([
       k.rect(k.width() * 2, k.height()),
       k.area(),
       k.pos(11805, -5340),
@@ -268,15 +213,6 @@ export class GameScene implements GAME.Scene {
       k.body({ isStatic: true }),
       k.color(35, 16, 0),
     ]);
-    k.add([
-      k.text("You Won!"),
-      k.pos(topPlatform.pos.x + topPlatform.width / 2, topPlatform.pos.y - 50), // Adjust position as needed
-      k.anchor("center"),
-      k.scale(3), // Adjust scale as needed
-      k.color(255, 255, 255), // Adjust color as needed
-      k.z(10), // Ensure it's above other entities
-    ]);
-    // GameScene.addRamp(11800, -5343, k.height(), 6150, 63.5);
   }
 
   private static addRamp(
@@ -297,7 +233,6 @@ export class GameScene implements GAME.Scene {
       k.anchor("botleft"),
       k.rotate(rotation), // Adjust angle of the ramp
     ]);
-    // const xOffset = 0;
 
     for (let i = 0; i < 10; i++) {
       k.add([
@@ -309,12 +244,6 @@ export class GameScene implements GAME.Scene {
         k.rotate(0),
       ]);
     }
-
-    // GameScene.rock?.onCollide((f) => {
-    //   if (GameScene.rock?.isColliding(ramp)) {
-    //     GameScene.rock.angle = rotation;
-    //   }
-    // });
     return ramp;
   }
 
@@ -325,6 +254,10 @@ export class GameScene implements GAME.Scene {
 
     if (player.pos.x < GameScene.BORDER_WIDTH) {
       player.pos.x = GameScene.BORDER_WIDTH;
+    }
+
+    if (player.pos.x > 13400) {
+      player.pos.x = 13400;
     }
 
     k.camPos(player.pos);
@@ -348,20 +281,10 @@ export class GameScene implements GAME.Scene {
       visibleArea.height !== playerInstance.prevVisibleArea.height ||
       visibleArea.width !== playerInstance.prevVisibleArea.width
     ) {
-      console.log("visible area change");
       emitData = { ...emitData, visibleArea };
       playerInstance.prevVisibleArea = visibleArea;
     }
     if (Game.socket.readyState === Game.socket.OPEN)
       Game.socket.send(JSON.stringify({ e: 1, d: emitData }));
-
-    if (Player.getInstance().obj.pos.y <= -5390) {
-      setTimeout(() => {
-        Player.getInstance().obj.pos.x = 0;
-        Player.getInstance().obj.pos.y = 0;
-
-        GameScene?.rock?.moveTo(k.vec2(950, -20));
-      }, 1000);
-    }
   };
 }

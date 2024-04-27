@@ -7,12 +7,9 @@ export const storagePostController = async (req: Request) => {
 
   if (!file) throw { message: 'No file found', code: 400 };
 
-  console.log(file);
-
   const saveFileData = await saveFile(file);
 
-  if (!saveFileData)
-    throw { message: 'Error while saving the file', code: 500 };
+  if (!saveFileData) throw { message: 'Error while saving the file', code: 500 };
 
   const isFileRegistered = await registerFile(
     saveFileData.name,

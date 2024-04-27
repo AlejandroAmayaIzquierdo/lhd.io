@@ -10,6 +10,8 @@ export class Player {
 
   public obj;
 
+  private isAlreadyWon = false;
+
   constructor(name?: string, initPos?: { x: number; y: number }) {
     this.name = name || "Player";
 
@@ -89,6 +91,14 @@ export class Player {
     });
 
     this.prevVisibleArea = { width: k.width(), height: k.height() };
+
+    this.obj.onUpdate(() => {
+      if (this.obj.pos.y <= -5390 && !this.isAlreadyWon) {
+        this.isAlreadyWon = true;
+
+        Game.socket.send(JSON.stringify({ e: 3, d: Game.userID }));
+      }
+    });
   }
 
   public getPosition = () => {

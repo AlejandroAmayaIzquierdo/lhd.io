@@ -26,7 +26,6 @@ export class RoomManager {
         if (isRoomCreated) {
           console.log('Room already created');
           isRoomCreated.join({ ...user, socket: socket });
-          console.log(isRoomCreated);
         } else {
           console.log('Room not created');
           this.createRoom(socket, roomID, user);
