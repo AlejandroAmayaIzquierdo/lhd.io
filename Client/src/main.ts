@@ -12,6 +12,14 @@ document.addEventListener("DOMContentLoaded", function () {
       const debugInput = document.getElementById(
         "debugInput"
       ) as HTMLInputElement;
+
+      const gameWrapper = document.getElementById(
+        "chatbox"
+      ) as HTMLInputElement;
+
+      gameWrapper.style["display"] = "block";
+      gameWrapper.style["opacity"] = "100";
+
       if (playerName && playerName.length > 0) {
         const g = Game.StartGame(playerName, debugInput.checked);
         g.changeScene(new GameScene());

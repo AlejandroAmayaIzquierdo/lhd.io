@@ -187,6 +187,10 @@ export class GameScene implements GAME.Scene {
         case 1:
           k.debug.log(data.d as string);
           break;
+        case 2:
+          console.log(data.d);
+          Game.appendChatMessage(data.d as string);
+          break;
         default:
           break;
       }

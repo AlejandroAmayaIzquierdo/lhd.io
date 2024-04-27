@@ -39,6 +39,10 @@ export class SocketHandler {
           if (message.visibleArea)
             game.getPlayer(message.userID)?.setVisibleArea(message.visibleArea);
           game.movePlayer(message.userID, message.x, message.y, message.rock);
+        } else if (e === 2) {
+          wsServer.clients.forEach((client) => {
+            client.send(JSON.stringify({ e: 2, d }));
+          });
         }
       });
 

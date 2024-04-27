@@ -27,6 +27,12 @@ export class Game {
     Game.socket.addEventListener("close", () => {
       this.changeScene(new DisconnectedScene());
     });
+
+    const chatInput = document.getElementById("chatInput") as HTMLInputElement;
+
+    chatInput.addEventListener("keypress", (event) =>
+      this.sendChat(event, chatInput.value)
+    );
   }
 
   public static StartGame = (playerName: string, debug?: boolean) => {
@@ -56,4 +62,28 @@ export class Game {
       Game.socket.send(JSON.stringify({ e: 0, d: joinRoomData }));
     });
   };
+
+  public sendChat = (
+    event: KeyboardEvent,
+    message: string,
+    roomID?: string
+  ) => {
+    if (event.key === "Enter") {
+      Game.socket.send(JSON.stringify({ e: 2, d: message }));
+
+      (document.getElementById("chatInput") as HTMLInputElement).value = "";
+    }
+  };
+
+  public static appendChatMessage(message: string) {
+    const chatList = document.getElementById("chatList");
+    if (!chatList) return;
+
+    const listItem = document.createElement("li");
+    listItem.textContent = message;
+    chatList.appendChild(listItem);
+
+    // Automatically scroll to the bottom of the chatbox
+    chatList.scrollTop = chatList.scrollHeight;
+  }
 }
