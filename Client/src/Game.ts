@@ -31,7 +31,6 @@ export class Game {
 
   public static StartGame = (playerName: string, debug?: boolean) => {
     const Kcontext = kaboom();
-    Kcontext.setBackground(25, 27, 28);
     if (debug) Kcontext.debug.inspect = true;
     return new Game(Kcontext, playerName);
   };

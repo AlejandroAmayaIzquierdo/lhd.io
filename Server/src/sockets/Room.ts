@@ -62,7 +62,6 @@ export class Room {
   public handle = () => {
     this.interval = setInterval(async () => {
       const players = this.game.getPlayers();
-      const entities = this.game.getEntities();
       this.usersInfo.forEach((user) => {
         if (!user.socket) return;
 
@@ -71,6 +70,12 @@ export class Room {
         const areaVisible = player?.getVisibleArea(); // radius
 
         if (!player || !areaVisible || !playerPosition) return;
+
+        if (playerPosition.y <= -5390) {
+          this.usersInfo.forEach((e) => {
+            e.socket?.send(JSON.stringify({ e: 1, d: `${player.userID} Just Won` }));
+          });
+        }
 
         const userVisibleToPlayer = players.filter((otherPlayer) => {
           if (otherPlayer.userID === user.userId) return false; // Exclude current user
@@ -90,25 +95,10 @@ export class Room {
           // Check if otherPlayer is within the visible area of the current user
           return distance < areaVisible;
         });
-        const entitiesVisible = entities.filter((entity) => {
-          const entityPosition = entity.getPosition();
 
-          if (!entityPosition) return false;
-
-          // distance between players
-          const distance = Math.sqrt(
-            Math.pow(playerPosition.x - entityPosition.x, 2) +
-              Math.pow(playerPosition.y - entityPosition.y, 2),
-          );
-          return distance < areaVisible;
-        });
-
-        let payload: { players: Player[]; entities?: Game.Entity[] } = {
+        const payload: { players: Player[]; entities?: Game.Entity[] } = {
           players: userVisibleToPlayer,
         };
-
-        if (entitiesVisible.length > 0)
-          payload = { ...payload, entities: entitiesVisible };
 
         user.socket.send(
           JSON.stringify({

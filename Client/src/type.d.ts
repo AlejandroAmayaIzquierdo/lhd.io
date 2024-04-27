@@ -10,12 +10,14 @@ declare namespace GAME {
     x: number;
     y: number;
     visibleArea?: { width: number; height: number };
+    rock?: { x: number; y: number };
   }
 
   interface PlayerData {
     userID: number;
     x: number;
     y: number;
+    rock: { x: number; y: number };
   }
 
   interface PayLoadUpdateEvent {

@@ -35,9 +35,15 @@ class Game {
     };
   }
 
-  public movePlayer = (userID: string, x: number, y: number) => {
+  public movePlayer = (
+    userID: string,
+    x: number,
+    y: number,
+    rock?: { x: number; y: number },
+  ) => {
     const p = this.players.find((e) => e.userID === userID);
     p?.move(x, y);
+    if (rock) p?.moveRock(rock?.x, rock?.y);
   };
 
   public getPlayer = (id: string) => this.players.find((e) => e.userID === id);

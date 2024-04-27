@@ -8,6 +8,8 @@ class Player {
 
   private visibleRadius: number = 0;
 
+  private rock: { x: number; y: number } = { x: 950, y: -20 };
+
   public constructor(
     userID: string,
     visibleArea: App.VisibleArea,
@@ -29,6 +31,10 @@ class Player {
   public move(x: number, y: number) {
     this.x = x;
     this.y = y;
+  }
+
+  public moveRock(x: number, y: number) {
+    this.rock = { x, y };
   }
 
   public getPosition(): { x: number; y: number } {

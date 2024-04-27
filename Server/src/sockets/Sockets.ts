@@ -28,6 +28,7 @@ export class SocketHandler {
             x: number;
             y: number;
             visibleArea?: { width: number; height: number };
+            rock?: { x: number; y: number };
           };
 
           const room = RoomManager.isSocketOnAnyRoom(socket);
@@ -37,7 +38,7 @@ export class SocketHandler {
 
           if (message.visibleArea)
             game.getPlayer(message.userID)?.setVisibleArea(message.visibleArea);
-          room.getGame().movePlayer(message.userID, message.x, message.y);
+          game.movePlayer(message.userID, message.x, message.y, message.rock);
         }
       });
 

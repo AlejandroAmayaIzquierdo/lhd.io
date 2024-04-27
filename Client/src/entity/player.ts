@@ -1,3 +1,4 @@
+// import { Vec2 } from "kaboom";
 import { Game } from "../Game";
 
 export class Player {
@@ -14,19 +15,31 @@ export class Player {
 
     const k = Game.context;
 
-    k.loadSpriteAtlas("Slime/idle.png", {
-      SlimeIdle: {
+    k.loadSpriteAtlas("PlayerSprite.png", {
+      Player: {
         x: 0,
         y: 0,
-        width: 64,
-        height: 14,
+        width: 36,
+        height: 30,
         sliceX: 4,
-        sliceY: 1,
+        sliceY: 3,
         anims: {
           idle: {
             from: 0,
             to: 3,
             speed: 4,
+            loop: true,
+          },
+          walk: {
+            from: 4,
+            to: 7,
+            speed: 6,
+            loop: true,
+          },
+          push: {
+            from: 8,
+            to: 11,
+            speed: 6,
             loop: true,
           },
         },
@@ -52,14 +65,28 @@ export class Player {
     //   },
     // });
     this.obj = k.add([
-      k.sprite("SlimeIdle", { anim: "idle" }),
-      k.pos(initPos?.x ?? 100, initPos?.y ?? 100),
+      k.sprite("Player", { anim: "push" }),
+      k.pos(initPos?.x ?? 0, initPos?.y ?? 0),
       k.z(1),
-      k.scale(5),
+      k.scale(10),
       k.anchor("center"),
-      k.area({ shape: new k.Rect(new k.Vec2(0, 0), 64 / 5, 64 / 5) }),
+      k.area({ shape: new k.Rect(new k.Vec2(0, 0), 10, 10) }),
       k.body(),
     ]);
+
+    this.obj.onKeyDown("a", () => {
+      this.obj.flipX = true;
+      if (this.obj.curAnim() !== "walk") this.obj.play("walk");
+    });
+    this.obj.onKeyDown("d", () => {
+      this.obj.flipX = false;
+      if (this.obj.curAnim() !== "walk") this.obj.play("walk");
+    });
+
+    this.obj.onUpdate(() => {
+      if (!k.isKeyDown("a") && !k.isKeyDown("d") && !k.isKeyDown("space"))
+        this.obj.play("idle");
+    });
 
     this.prevVisibleArea = { width: k.width(), height: k.height() };
   }
@@ -67,6 +94,12 @@ export class Player {
   public getPosition = () => {
     const { x, y } = this.obj.pos;
     return { x, y };
+  };
+
+  public Jump = (force: number) => {
+    this.obj.jump(Math.abs(force));
+    // const dir = force > 0 ? 1 : -1;
+    // this.obj.moveTo(10000 * dir, 0, 1000);
   };
 
   public static getInstance(): Player {
